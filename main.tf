@@ -8,51 +8,28 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-2"
+  region = var.region
 }
 
 # Create the VPC
 resource "aws_vpc" "my_vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc
 
   tags = {
-    Name = "Solar System"
+    Name = var.tags
   }
 }
 
-### PUBLIC SUBNET A ###
-resource "aws_subnet" "public_subnet_a" {
+### DEPLOY PUBLIC SUBNETS ###
+resource "aws_subnet" "public_subnet" {
+  count = length(var.public_subnets)
   vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "us-west-2a"
+  cidr_block = var.public_subnets[count.index]
+  availability_zone = data.aws_availability_zones.available_azs.names[count.index]
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Public Subnet A"
-  }
-}
-
-### PUBLIC SUBNET B ###
-resource "aws_subnet" "public_subnet_b" {
-  vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "us-west-2b"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "Public Subnet B"
-  }
-}
-
-### PUBLIC SUBNET C ###
-resource "aws_subnet" "public_subnet_c" {
-  vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.3.0/24"
-  availability_zone = "us-west-2c"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "Public Subnet C"
+    Name = "Public Subnet ${count.index + 1}"
   }
 }
 
@@ -61,7 +38,7 @@ resource "aws_internet_gateway" "my_igw" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
-    Name = "MY IGW"
+    Name = var.tags
   }
 }
 
@@ -70,7 +47,7 @@ resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.my_vpc.id
 
   tags = {
-    Name = "Public Route Table"
+    Name = var.tags
   }
 }
 
@@ -81,21 +58,10 @@ resource "aws_route" "public_internet_route" {
   gateway_id = aws_internet_gateway.my_igw.id
 }
 
-### ROUTE TABLE SUBNET ASSOCIATION PUBLIC SUBNET A ###
-resource "aws_route_table_association" "public_subnet_association_a" {
-  subnet_id = aws_subnet.public_subnet_a.id
-  route_table_id = aws_route_table.public_rt.id
-}
-
-### ROUTE TABLE SUBNET ASSOCIATION PUBLIC SUBNET B ###
-resource "aws_route_table_association" "public_subnet_association_b" {
-  subnet_id = aws_subnet.public_subnet_b.id
-  route_table_id = aws_route_table.public_rt.id
-}
-
-### ROUTE TABLE SUBNET ASSOCIATION PUBLIC SUBNET C ###
-resource "aws_route_table_association" "public_subnet_association_c" {
-  subnet_id = aws_subnet.public_subnet_c.id
+### ROUTE TABLE SUBNET ASSOCIATION FOR PUBLIC SUBNETS ###
+resource "aws_route_table_association" "public_subnet_association" {
+  count = length(aws_subnet.public_subnet)
+  subnet_id = aws_subnet.public_subnet[count.index].id
   route_table_id = aws_route_table.public_rt.id
 }
 
@@ -104,50 +70,26 @@ resource "aws_eip" "nat_eip" {
   domain = "vpc"
 }
 
-### CREATE NAT GATEWAY IN PUBLIC SUBNET A ###
-resource "aws_nat_gateway" "aws_nat_gateway_a" {
-  allocation_id =  aws_eip.nat_eip.id  # Associate the NAT Gateway with the Elastic IP
-  subnet_id = aws_subnet.public_subnet_a.id # Public Subnet A where the NAT Gateway will be created
+### CREATE NAT GATEWAY IN PUBLIC SUBNET ###
+resource "aws_nat_gateway" "aws_nat_gateway" {
+  allocation_id =  aws_eip.nat_eip.allocation_id  # Associate the NAT Gateway with the Elastic IP
+  subnet_id = aws_subnet.public_subnet[0].id # Public Subnet A where the NAT Gateway will be created
 
   tags = {
-    Name = "NAT GATEWAY"
+    Name = var.tags
   }
   depends_on = [aws_internet_gateway.my_igw]
 }
 
-### PRIVATE SUBNET A ###
-resource "aws_subnet" "private_subnet_a" {
+### DEPLOY PRIVATE SUBNETS ###
+resource "aws_subnet" "private_subnet" {
+  count = length(var.private_subnets)
   vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.4.0/24"
-  availability_zone = "us-west-2a"
-  map_public_ip_on_launch = "false"
-
+  cidr_block = var.private_subnets[count.index]
+  availability_zone = data.aws_availability_zones.available_azs.names[count.index]
+  
   tags = {
-    Name = "Private Subnet A"
-  }
-}
-
-### PRIVATE SUBNET B ###
-resource "aws_subnet" "private_subnet_b" {
-  vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.5.0/24"
-  availability_zone = "us-west-2b"
-  map_public_ip_on_launch = "false"
-
-  tags = {
-    Name = "Private Subnet B"
-  }
-}
-
-### PRIVATE SUBNET C ###
-resource "aws_subnet" "private_subnet_c" {
-  vpc_id = aws_vpc.my_vpc.id
-  cidr_block = "10.0.6.0/24"
-  availability_zone = "us-west-2c"
-  map_public_ip_on_launch = "false"
-
-  tags = {
-    Name = "Private Subnet C"
+    Name = "Private Subnet ${count.index + 1}"
   }
 }
 
@@ -164,30 +106,19 @@ resource "aws_route_table" "private_rt" {
 resource "aws_route" "private_internet_route" {
   route_table_id = aws_route_table.private_rt.id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.aws_nat_gateway_a.id
+  nat_gateway_id = aws_nat_gateway.aws_nat_gateway.id
 }
 
-### ROUTE TABLE SUBNET ASSOCIATION PRIVATE SUBNET A ###
-resource "aws_route_table_association" "private_subnet_association_a" {
-  subnet_id = aws_subnet.private_subnet_a.id
-  route_table_id = aws_route_table.private_rt.id
-}
-
-### ROUTE TABLE SUBNET ASSOCIATION PRIVATE SUBNET B ###
-resource "aws_route_table_association" "private_subnet_association_b" {
-  subnet_id = aws_subnet.private_subnet_b.id
-  route_table_id = aws_route_table.private_rt.id
-}
-
-### ROUTE TABLE SUBNET ASSOCIATION PRIVATE SUBNET CC ###
-resource "aws_route_table_association" "private_subnet_association_c" {
-  subnet_id = aws_subnet.private_subnet_c.id
+### ROUTE TABLE ASSOCIATION FOR PRIVATE SUBNETS ###
+resource "aws_route_table_association" "private_subnet_association" {
+  count = length(aws_subnet.private_subnet)
+  subnet_id = aws_subnet.private_subnet[count.index].id
   route_table_id = aws_route_table.private_rt.id
 }
 
 ### CREATE PRIVATE ROUTE53 ZONE ###
 resource "aws_route53_zone" "private_zone" {
-  name = "internal.zone.com"
+  name = var.route53_private_zone
   vpc {
     vpc_id = aws_vpc.my_vpc.id # Associate the zone with the VPC
   }
@@ -195,15 +126,13 @@ resource "aws_route53_zone" "private_zone" {
 
 ### CREATE THE EKS CLUSTER ###
 resource "aws_eks_cluster" "my_eks_cluster" {
-  name = "my_eks_cluster"
+  name = var.eks_cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = [
-        aws_subnet.private_subnet_a.id,
-        aws_subnet.private_subnet_b.id,
-        aws_subnet.private_subnet_c.id
-    ]
+    subnet_ids = aws_subnet.private_subnet[*].id  # Dynamically fetches all private subnet IDs
+    endpoint_private_access = true                # Enable private API endpoint
+    endpoint_public_access  = false               # Disable public API endpoint
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
@@ -274,13 +203,9 @@ resource "aws_iam_role_policy_attachment" "eks_registry_policy" {
 ### ON DEMAND NODE GROUP ###
 resource "aws_eks_node_group" "on_demand_node_group" {
   cluster_name = aws_eks_cluster.my_eks_cluster.name
-  node_group_name = "on-demand-node-group"
+  node_group_name = "on_demand_node_group"
   node_role_arn = aws_iam_role.eks_node_group_role.arn
-  subnet_ids = [
-    aws_subnet.private_subnet_a.id,
-    aws_subnet.private_subnet_b.id,
-    aws_subnet.private_subnet_c.id
-  ]
+  subnet_ids = aws_subnet.private_subnet[*].id # Dynamically references all private subnets
 
   scaling_config {
     desired_size = 2
@@ -300,13 +225,9 @@ resource "aws_eks_node_group" "on_demand_node_group" {
 ### SPOT NODE GROUP ###
 resource "aws_eks_node_group" "spot_node_group" {
   cluster_name = aws_eks_cluster.my_eks_cluster.name
-  node_group_name = "spot-node-group"
+  node_group_name = "spot_node_group"
   node_role_arn =  aws_iam_role.eks_node_group_role.arn
-  subnet_ids = [
-    aws_subnet.private_subnet_a.id,
-    aws_subnet.private_subnet_b.id,
-    aws_subnet.private_subnet_c.id
-  ]
+  subnet_ids = aws_subnet.private_subnet[*].id # Dynamically references all private subnets
 
   scaling_config {
     desired_size = 2
