@@ -1,26 +1,30 @@
 output "vpc_id" {
-  value = aws_vpc.my_vpc.id
+  value = module.vpc.vpc_id
 }
 
 output "public_subnets_ids" {
-  value = aws_subnet.public_subnet[*].id
+  value = module.vpc.public_subnets
   description = "List of IDs for all public subnets"
 }
 
 output "private_subnet_ids" {
-  value = aws_subnet.private_subnet[*].id
+  value = module.vpc.private_subnets
   description = "List of IDs for all private subnets"
 }
 
 output "internet_gateway_id" {
-    value = aws_internet_gateway.my_igw.id
+    value = module.vpc.igw_id
 }
 
 output "nat_gateway_id" {
-  value = aws_nat_gateway.aws_nat_gateway.id
+  value = module.vpc.nat_ids
 }
 
 output "eks_cluster_endpoint" {
-  value = aws_eks_cluster.my_eks_cluster.endpoint
+  value = module.eks.cluster_endpoint
   description = "The endpoint for the EKS cluster API server"
+}
+
+output "private_subnets" {
+  value = module.vpc.private_subnets
 }

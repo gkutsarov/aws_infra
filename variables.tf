@@ -1,3 +1,8 @@
+variable "vpc_name" {
+  description = "Variable name for the created VPC"
+  default = "AWS Module VPC"
+}
+
 variable "tags" {
   description = "Tags for all the resources provisioned."
   default = "AWS_INFRA_TF"
@@ -37,4 +42,25 @@ variable "eks_cluster_name" {
   description = "Name of the EKS Cluster"
   type = string
   default = "my_eks_cluster"
+}
+
+variable "cluster_service_cidr" {
+  description = "The CIDR block for the K8S service network"
+  type = string
+  default = "10.10.0.0/16"
+}
+
+variable "node_group_name" {
+  type = string
+  default = "my_managed_node_group"
+}
+
+variable "type_on_demand" {
+  type = string
+  default = "ON_DEMAND"
+}
+
+variable "type_spot" {
+  type = string
+  default = "SPOT"
 }
