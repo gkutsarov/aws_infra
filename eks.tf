@@ -9,10 +9,22 @@ module "eks" {
   cluster_endpoint_public_access = false
 
   cluster_addons = {
-    coredns                = {}
-    eks-pod-identity-agent = {}
-    kube-proxy             = {}
-    vpc-cni                = {}
+    coredns                = {
+        most_recent = true
+        resolve_conflicts = "OVERWRITE"
+    }
+    eks-pod-identity-agent = {
+        resolve_conflicts = "OVERWRITE"
+        most_recent = true
+    }
+    kube-proxy             = {
+        resolve_conflicts = "OVERWRITE"
+        most_recent = true
+    }
+    vpc-cni                = {
+        resolve_conflicts = "OVERWRITE"
+        most_recent = true
+    }
   }
 
   vpc_id = module.vpc.vpc_id 
@@ -20,6 +32,7 @@ module "eks" {
   control_plane_subnet_ids = module.vpc.private_subnets
 
   cluster_service_ipv4_cidr = var.cluster_service_cidr
+
 
   tags = {
     Name = var.tags
