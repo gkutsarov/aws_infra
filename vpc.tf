@@ -4,13 +4,13 @@ module "vpc" {
   name = var.vpc_name
   cidr = var.vpc
 
-  azs = data.aws_availability_zones.available_azs.names
-  public_subnets = var.public_subnets
+  azs             = data.aws_availability_zones.available_azs.names
+  public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
-  enable_dns_support = true
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
