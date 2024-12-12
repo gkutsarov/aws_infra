@@ -8,6 +8,28 @@ module "eks" {
   cluster_endpoint_private_access      = true
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = ["77.70.78.206/32"]
+  authentication_mode = "API"
+
+  access_entries = {
+    eks_admin = {
+      principal_arn = aws_iam_role.eks_admin_role.arn
+
+      policy_associations = {
+        eks_admin_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+        eks_cluster_policy = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+  }
 
   cluster_addons = {
     coredns = {
@@ -76,6 +98,22 @@ module "eks" {
   }
   tags = {
     Name = var.tags
+  }
+}
+
+module "iam_eks_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name = "pod_service_account"
+
+  role_policy_arns = {
+    policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  }
+
+  oidc_providers = {
+    one = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["default:pod_service_account"]
+    }
   }
 }
 

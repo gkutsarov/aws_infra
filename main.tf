@@ -12,31 +12,27 @@ resource "aws_route53_zone" "private_zone" {
   }
 }
 
-resource "aws_iam_role" "eks_admin" {
+resource "aws_iam_user" "eks_admin" {
+  name = "eks_admin"
+}
+
+resource "aws_iam_role" "eks_admin_role" {
   name = "eks_admin_role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-        {
-            Effect = "Allow"
-            Principal = { Service = "eks.amazonaws.com"}
-            Action = "sts:AssumeRole"
-        },
-        {
-          Effect = "Allow"
-          Principal = {
-            AWS = "arn:aws:iam::905418146175:user/iamadmin"}
-            Action = "sts:AssumeRole"
+      {
+        Action    = "sts:AssumeRole"
+        Effect    = "Allow"
+        Principal = {
+          AWS = aws_iam_user.eks_admin.arn
         }
+      }
     ]
   })
 }
 
-resource "aws_iam_policy_attachment" "eks_admin_policy" {
-  name = "eks_admin_policy_attachment"
-  roles = [aws_iam_role.eks_admin.name]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-}
 
 
 

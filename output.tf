@@ -28,3 +28,7 @@ output "eks_cluster_endpoint" {
 output "private_subnets" {
   value = module.vpc.private_subnets
 }
+
+output "eks_admin_role_arn" {
+  value = aws_iam_role.eks_admin_role.arn
+}
