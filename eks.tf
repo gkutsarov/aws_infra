@@ -101,9 +101,10 @@ module "eks" {
   }
 }
 
+
 module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = "pod_service_account"
+  role_name = "pod-service-account"
 
   role_policy_arns = {
     policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
@@ -112,7 +113,7 @@ module "iam_eks_role" {
   oidc_providers = {
     one = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["default:pod_service_account"]
+      namespace_service_accounts = ["default:pod-service-account"]
     }
   }
 }

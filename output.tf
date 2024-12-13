@@ -32,3 +32,8 @@ output "private_subnets" {
 output "eks_admin_role_arn" {
   value = aws_iam_role.eks_admin_role.arn
 }
+
+output "auth_token" {
+  value = data.aws_eks_cluster_auth.auth.token
+  sensitive = true
+}
