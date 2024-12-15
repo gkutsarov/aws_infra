@@ -25,6 +25,14 @@ output "eks_cluster_endpoint" {
   description = "The endpoint for the EKS cluster API server"
 }
 
+output "eks_cluster_ca" {
+  value = module.eks.cluster_certificate_authority_data
+}
+
+output "eks_cluster_name" {
+  value = module.eks.cluster_name
+}
+
 output "private_subnets" {
   value = module.vpc.private_subnets
 }
@@ -34,6 +42,9 @@ output "eks_admin_role_arn" {
 }
 
 output "auth_token" {
-  value = data.aws_eks_cluster_auth.auth.token
+  value     = data.aws_eks_cluster_auth.auth.token
   sensitive = true
 }
+
+
+

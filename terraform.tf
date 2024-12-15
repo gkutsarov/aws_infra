@@ -4,14 +4,14 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    
+
     kubernetes = {
-      source = "hashicorp/kubernetes"
+      source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
 
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
       version = "~> 2.0"
     }
   }
@@ -19,18 +19,32 @@ terraform {
 
 provider "aws" {
   region = var.region
+  assume_role {
+    role_arn = "arn:aws:iam::905418146175:role/eks_admin_role"
+    session_name = "MySession"
+  }
 }
 
 provider "kubernetes" {
-  host = module.eks.cluster_endpoint
+  config_path = "/home/kug1be/.kube/config"
+  host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token = data.aws_eks_cluster_auth.auth.token
+  exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name]
+      command     = "aws"
+    }
 }
 
 provider "helm" {
   kubernetes {
-    host = module.eks.cluster_endpoint
+    config_path = "/home/kug1be/.kube/config"
+    host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token = data.aws_eks_cluster_auth.auth.token
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name]
+      command     = "aws"
+    }
   }
 }

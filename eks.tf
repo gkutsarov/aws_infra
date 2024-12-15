@@ -8,7 +8,7 @@ module "eks" {
   cluster_endpoint_private_access      = true
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = ["77.70.78.206/32"]
-  authentication_mode = "API"
+  authentication_mode                  = "API"
 
   access_entries = {
     eks_admin = {
@@ -76,7 +76,7 @@ module "eks" {
 
       labels = {
         environment = "production"
-        type = "on_demand"
+        type        = "on_demand"
       }
     }
     spot = {
@@ -92,7 +92,7 @@ module "eks" {
 
       labels = {
         environment = "development"
-        type = "spot"
+        type        = "spot"
       }
     }
   }
