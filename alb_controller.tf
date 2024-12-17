@@ -23,3 +23,4 @@ EOF
 - namespace
 - role-name
 - policy attached 
+*/
