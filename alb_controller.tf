@@ -16,3 +16,10 @@ EOF
 
   depends_on = [module.iam_eks_role]
 }
+
+/* need to have 
+- service account
+- cluster name
+- namespace
+- role-name
+- policy attached 
