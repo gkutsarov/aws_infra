@@ -1,7 +1,7 @@
 resource "helm_release" "metrics_server" {
   name  = "metrics-server"
   chart = "metrics-server" # Chart name
-  #namespace  = "kube-system"   # Deploying into the kube-system namespace
+  namespace  = "default"   # Deploying into the default namespace
 
   repository = "https://kubernetes-sigs.github.io/metrics-server/" # Official Kubernetes SIG repository
   version    = "3.10.0"                                            # Specify the chart version you want

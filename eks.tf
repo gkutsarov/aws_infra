@@ -108,6 +108,7 @@ module "iam_eks_role" {
 
   role_policy_arns = {
     policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+    /*policy = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"*/
   }
 
   oidc_providers = {
@@ -117,5 +118,7 @@ module "iam_eks_role" {
     }
   }
 }
+
+
 
 
