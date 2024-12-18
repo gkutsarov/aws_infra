@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-s3-pod
+  namespace: default
+spec:
+  serviceAccountName: pod-service-account
+  containers:
+  - name: aws-cli
+    image: amazon/aws-cli:latest
+    command: ["sh", "-c", "aws s3 ls s3://my-terraform-state-gk; sleep 600"]
+
+      
