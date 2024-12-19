@@ -102,7 +102,7 @@ module "eks" {
 }
 
 
-module "iam_eks_role" {
+module "iam_eks_role" { # service account role
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   role_name = "pod-service-account"
 
@@ -115,6 +115,20 @@ module "iam_eks_role" {
     one = {
       provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["default:pod-service-account"]
+    }
+  }
+}
+
+module "lb_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name = "load-balancer-role"
+
+  attach_load_balancer_controller_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
     }
   }
 }
