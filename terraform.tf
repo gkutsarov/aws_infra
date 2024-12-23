@@ -19,10 +19,6 @@ terraform {
 
 provider "aws" {
   region = var.region
-  /*assume_role {
-    role_arn     = "arn:aws:iam::905418146175:role/eks_admin_role"
-    session_name = "MySession"
-  }*/
 }
 
 provider "kubernetes" {

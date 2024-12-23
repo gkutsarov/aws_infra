@@ -39,7 +39,8 @@ resource "aws_iam_role" "eks_admin_role" {
   })
 }
 
-# TO DO the same as the below kubernetes_service_account
+
+/*
 resource "kubernetes_service_account" "pod-service-account" {
   metadata {
     name = "pod-service-account"
@@ -64,7 +65,7 @@ resource "kubernetes_service_account" "load-balancer-controller" {
       "eks.amazonaws.com/role-arn" = module.lb_role.iam_role_arn
     }
   }
-}
+}*/
 
 
 

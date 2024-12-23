@@ -5,11 +5,12 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: join(", ", var.public_subnets)
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
   ingressClassName: alb
   rules:
-  - host: example.your-domain.com
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
@@ -18,4 +19,3 @@ spec:
             name: example-service
             port:
               number: 80
-
