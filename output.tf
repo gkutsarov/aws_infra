@@ -45,6 +45,3 @@ output "auth_token" {
   value     = data.aws_eks_cluster_auth.auth.token
   sensitive = true
 }
-
-
-

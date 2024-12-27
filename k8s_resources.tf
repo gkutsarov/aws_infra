@@ -1,46 +1,26 @@
-resource "kubernetes_service_account" "vpc_cni_service_account_custom" {
-  depends_on = [module.eks]
+resource "kubernetes_config_map" "html_config" {
   metadata {
-    name = "vpc_cni_service_account_custom"
-    namespace = "kube-system"
-    labels = {
-      "app.kubernetes.io/name" = "vpc_cni_service_account_custom"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.cni_irsa_role.iam_role_arn
-    }
-  }
-}
-
-
-resource "kubernetes_config_map" "app1_config" {
-  depends_on = [module.eks]
-  metadata {
-    name = "app1config"
+    name = "html-config"
   }
 
   data = {
-    "index.html" = "<html><body><h1>Deployment 1</h1></body></html>"
-    "nginx.conf" = <<EOF
-    server {
-    listen 80;
-    location / {
-        root /usr/share/nginx/html;
-        index index.html;
-    }
-}
-EOF
+    "index.html" = <<EOF
+    <html>
+    <body>
+      <h1>HELLO WORLD!</h1>
+    </body>
+    </html>
+    EOF
   }
 }
 
-resource "kubernetes_service" "service1" {
-  depends_on = [module.eks]
+resource "kubernetes_service" "service" {
   metadata {
-    name = "service1"
+    name = "service"
   }
   spec {
     selector = {
-      app = kubernetes_deployment.app1.metadata.0.labels.app
+      app = kubernetes_deployment.app.metadata[0].labels.app
     }
     port {
       port        = 80
@@ -52,12 +32,11 @@ resource "kubernetes_service" "service1" {
 }
 
 
-resource "kubernetes_deployment" "app1" {
-  depends_on = [module.eks]
+resource "kubernetes_deployment" "app" {
   metadata {
-    name = "app1"
+    name = "app"
     labels = {
-      app = "my-app1"
+      app = "my-app"
     }
   }
 
@@ -65,136 +44,42 @@ resource "kubernetes_deployment" "app1" {
     replicas = 2
     selector {
       match_labels = {
-        app = "my-app1"
+        app = "my-app"
       }
     }
+
     template {
       metadata {
         labels = {
-          app = "my-app1"
+          app = "my-app"
         }
       }
+
       spec {
         volume {
-          name = "nginx-config"
+          name = "html-config"
           config_map {
-            name = kubernetes_config_map.app1_config.metadata.0.name
+            name = kubernetes_config_map.html_config.metadata[0].name
           }
         }
         container {
+          name  = "nginx"
           image = "nginx"
-          name = "my-app1"
+          volume_mount {
+            name = "html-config"
+            mount_path = "/usr/share/nginx/html/index.html"
+            sub_path = "index.html"
+          }
           port {
             container_port = 80
           }
-          volume_mount {
-            name = "nginx-config"
-            mount_path = "/usr/share/nginx/html"
-            sub_path = "index.html"
-          }
-          volume_mount {
-            name = "nginx-config"
-            mount_path = "/etc/nginx/nginx.conf"
-            sub_path = "nginx.conf"
-          }
         }
       }
     }
   }
 }
 
-resource "kubernetes_config_map" "app2_config" {
-  depends_on = [module.eks]
-  metadata {
-    name = "app2config"
-  }
-
-  data = {
-    "index.html" = "<html><body><h1>Deployment 2</h1></body></html>"
-    "nginx.conf" = <<EOF
-    server {
-    listen 80;
-    location / {
-        root /usr/share/nginx/html;
-        index index.html;
-    }
-}
-EOF
-  }
-}
-
-resource "kubernetes_service" "service2" {
-  depends_on = [module.eks]
-  metadata {
-    name = "service2"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.app2.metadata.0.labels.app
-    }
-    port {
-      port        = 80
-      target_port = 80
-    }
-
-    type = "ClusterIP"
-  }
-}
-
-
-resource "kubernetes_deployment" "app2" {
-  depends_on = [module.eks]
-  metadata {
-    name = "app2"
-    labels = {
-      app = "my-app2"
-    }
-  }
-
-  spec {
-    replicas = 2
-    selector {
-      match_labels = {
-        app = "my-app2"
-      }
-    }
-    template {
-      metadata {
-        labels = {
-          app = "my-app2"
-        }
-      }
-      spec {
-        volume {
-          name = "nginx-config"
-          config_map {
-            name = kubernetes_config_map.app2_config.metadata.0.name
-          }
-        }
-        container {
-          image = "nginx"
-          name = "my-app1"
-          port {
-            container_port = 80
-          }
-          volume_mount {
-            name = "nginx-config"
-            mount_path = "/usr/share/nginx/html"
-            sub_path = "index.html"
-          }
-          volume_mount {
-            name = "nginx-config"
-            mount_path = "/etc/nginx/nginx.conf"
-            sub_path = "nginx.conf"
-          }
-        }
-      }
-    }
-  }
-}
-
-/*resource "kubernetes_ingress_v1" "myingress" {
-  depends_on = [module.eks]
+resource "kubernetes_ingress_v1" "myingress" {
   wait_for_load_balancer = true
   metadata {
     name = "example-ingress"
@@ -219,23 +104,11 @@ resource "kubernetes_deployment" "app2" {
     rule {
       http {
         path {
-          path     = "/app1"
-          path_type = "Prefix" # Required in networking.k8s.io/v1
+          path     = "/"
+          path_type = "Prefix"
           backend {
             service {
-              name = "service1"
-              port {
-                number = 80
-              }
-            }
-          }
-        }
-        path {
-          path     = "/app2"
-          path_type = "Prefix" # Required in networking.k8s.io/v1
-          backend {
-            service {
-              name = "service2"
+              name = kubernetes_service.service.metadata[0].name
               port {
                 number = 80
               }
@@ -245,5 +118,4 @@ resource "kubernetes_deployment" "app2" {
       }
     }
   }
-}*/
-
+}

@@ -96,19 +96,16 @@ module "eks" {
       }
     }
   }
-  tags = {
-    Name = var.tags
-  }
+  tags = var.tags
 }
 
 
-module "iam_eks_role" { # service account role
+module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   role_name = "pod-service-account"
 
   role_policy_arns = {
     policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-    /*policy = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"*/
   }
 
   oidc_providers = {
@@ -146,7 +143,6 @@ module "cni_irsa_role" {
     }
   }
 }
-
 
 
 

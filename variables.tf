@@ -5,7 +5,12 @@ variable "vpc_name" {
 
 variable "tags" {
   description = "Tags for all the resources provisioned."
-  default     = "AWS_INFRA_TF"
+  type = map(string)
+   default = {
+    "Environment" = "Development"
+    "Owner"       = "Grozdimir"
+    "Project"     = "MyAWSProject"
+  }
 }
 
 variable "region" {

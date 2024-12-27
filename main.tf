@@ -7,9 +7,7 @@ resource "aws_route53_zone" "private_zone" {
 
   comment = "Private Route 53 Zone for internal use."
 
-  tags = {
-    Name = var.tags
-  }
+  tags = var.tags
 }
 
 resource "aws_iam_user" "eks_admin" {
@@ -39,33 +37,6 @@ resource "aws_iam_role" "eks_admin_role" {
   })
 }
 
-
-/*
-resource "kubernetes_service_account" "pod-service-account" {
-  metadata {
-    name = "pod-service-account"
-    namespace = "default"
-    labels = {
-      "app.kubernetes.io/name" = "pod-service-account"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_eks_role.iam_role_arn
-    }
-  }
-}
-
-resource "kubernetes_service_account" "load-balancer-controller" {
-  metadata {
-    name = "aws-load-balancer-controller"
-    namespace = "kube-system"
-    labels = {
-      "app.kubernetes.io/name" = "aws-load-balancer-controller"
-    }
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.lb_role.iam_role_arn
-    }
-  }
-}*/
 
 
 
