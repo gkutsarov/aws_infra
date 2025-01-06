@@ -1,4 +1,4 @@
-resource "kubernetes_config_map" "html_config" {
+/*resource "kubernetes_config_map" "html_config" {
   metadata {
     name = "html-config"
   }
@@ -119,3 +119,4 @@ resource "kubernetes_ingress_v1" "myingress" {
     }
   }
 }
+*/

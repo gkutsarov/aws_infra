@@ -1,0 +1,28 @@
+replicaCount: 2
+image:
+  repository: nginx
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  name: service
+  type: ClusterIP
+  port: 80
+
+configMap:
+  name: my-custom-configmap
+
+ingress:
+  enabled: true
+  name: example-ingress
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  paths:
+    - path: /
+      pathType: Prefix
+      backend:
+        serviceName: service  # This references the Service from values.yaml
+        servicePort: 80
