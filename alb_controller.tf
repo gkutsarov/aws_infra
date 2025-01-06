@@ -4,30 +4,38 @@ resource "helm_release" "aws_lb_controller" {
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
   
-
-
-#to check if service account create set to true and in main the resource on line 56 is commented - does the service account get created with the correct annotation
-  /*set {
-    name = "serviceAccount.create"
-    value = "false"
-  }
-
-  set {
-    name = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
-  }*/
-
-  values = [
-    <<EOF
-clusterName: "${var.eks_cluster_name}"
-region: "${var.region}"
-vpcId: "${module.vpc.vpc_id}"
-serviceAccount:
-  name: aws-load-balancer-controller
-  annotations: 
-    eks.amazonaws.com/role-arn: "${module.lb_role.iam_role_arn}"
-EOF
-]
-
+  version    = "1.9.2"
   
+  set {
+    name  = "clusterName"
+    value = module.eks.cluster_name
+  }
+  set {
+    name  = "image.tag"
+    value = "v2.9.2"
+  }
+  set {
+    name  = "replicaCount"
+    value = 2
+  }
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.lb_role.iam_role_arn
+  }
+  set {
+    name  = "nodeSelector.type"
+    value = "on_demand"
+  }
+  set {
+    name  = "region"
+    value = var.region
+  }
+  set {
+    name  = "vpcId"
+    value = module.vpc.vpc_id
+  }
 }

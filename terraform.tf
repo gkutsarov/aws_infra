@@ -29,16 +29,7 @@ provider "kubernetes" {
   #config_path            = "/home/kug1be/.kube/config"
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args = [
-        "eks", "get-token",
-        "--cluster-name", module.eks.cluster_name,
-        "--region", var.region,
-        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"  # Add your correct role ARN here
-      ]
-    }
+  token                  = data.aws_eks_cluster_auth.auth.token
 }
 
 provider "helm" {
@@ -46,15 +37,6 @@ provider "helm" {
     #config_path            = "/home/kug1be/.kube/config"
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args = [
-        "eks", "get-token",
-        "--cluster-name", module.eks.cluster_name,
-        "--region", var.region,
-        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"  # Add your correct role ARN here
-      ]
-    }
+    token                  = data.aws_eks_cluster_auth.auth.token
   }
 }

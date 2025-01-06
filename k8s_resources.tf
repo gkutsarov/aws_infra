@@ -84,15 +84,11 @@ resource "kubernetes_ingress_v1" "myingress" {
   metadata {
     name = "example-ingress"
     annotations = {
-      "alb.ingress.kubernetes.io/scheme"       = "internet-facing"
-      "alb.ingress.kubernetes.io/ingress.class"       = "alb"
-      "alb.ingress.kubernetes.io/target-type" = "ip"
-      "alb.ingress.kubernetes.io/subnets"             = join(", ", [
-        data.aws_subnet.public_subnet_1.id,
-        data.aws_subnet.public_subnet_2.id,
-        data.aws_subnet.public_subnet_3.id
-      ])
-      "alb.ingress.kubernetes.io/listen-ports" = jsonencode([{
+      "alb.ingress.kubernetes.io/scheme"        = "internet-facing"
+      "alb.ingress.kubernetes.io/ingress.class" = "alb"
+      "alb.ingress.kubernetes.io/target-type"   = "ip"
+      "alb.ingress.kubernetes.io/subnets"       = module.vpc.public_subnets
+      "alb.ingress.kubernetes.io/listen-ports"  = jsonencode([{
         HTTP = 80
       }])
     }
