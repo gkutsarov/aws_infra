@@ -40,3 +40,4 @@ data "aws_subnet" "public_subnet_3" {
   }
   depends_on = [module.vpc]
 }
+

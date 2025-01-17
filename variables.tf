@@ -5,8 +5,8 @@ variable "vpc_name" {
 
 variable "tags" {
   description = "Tags for all the resources provisioned."
-  type = map(string)
-   default = {
+  type        = map(string)
+  default = {
     "Environment" = "Development"
     "Owner"       = "Grozdimir"
     "Project"     = "MyAWSProject"
@@ -43,49 +43,94 @@ variable "route53_private_zone" {
   default     = "internal.zone.com"
 }
 
-variable "eks_cluster_name" {
-  description = "Name of the EKS Cluster"
-  type        = string
-  default     = "my_eks_cluster"
-}
-
 variable "cluster_service_cidr" {
   description = "The CIDR block for the K8S service network"
   type        = string
   default     = "10.10.0.0/16"
 }
 
-variable "on_demand_group" {
-  type    = string
-  default = "on_demand_group"
+variable "eks_cluster_name" {
+  description = "Name of the EKS Cluster"
+  type        = string
+  default     = "my_eks_cluster"
 }
 
-variable "spot_group" {
-  type    = string
-  default = "spot_group"
+variable "eks_cluster_version" {
+  type        = string
+  description = "EKS cluster version."
+  default     = "1.31"
 }
 
-variable "type_on_demand" {
+variable "eks_coredns_version" {
+  type        = string
+  description = "CoreDNS version."
+  default     = "v1.11.4-eksbuild.2"
+}
+
+variable "eks_kube_proxy_version" {
+  type        = string
+  description = "Kube proxy version."
+  default     = "v1.31.3-eksbuild.2"
+}
+
+variable "eks_vpc_cni_version" {
+  type        = string
+  description = "VPC CNI version."
+  default     = "v1.19.0-eksbuild.1"
+}
+
+variable "eks_pod_identity_agent_version" {
+  type        = string
+  description = "EKS pod identity agent version."
+  default     = "v1.3.4-eksbuild.1"
+}
+
+variable "eks_on_demand_type" {
   type    = string
   default = "ON_DEMAND"
 }
 
-variable "type_spot" {
+variable "eks_on_demand_min_size" {
+  type    = string
+  default = "1"
+}
+
+variable "eks_on_demand_max_size" {
+  type    = string
+  default = "1"
+}
+
+variable "eks_on_demand_desired_size" {
+  type    = string
+  default = "1"
+}
+
+variable "eks_on_demand_group" {
+  type    = string
+  default = "on_demand_group"
+}
+
+variable "eks_spot_type" {
   type    = string
   default = "SPOT"
 }
 
-variable "min_size" {
+variable "eks_spot_min_size" {
   type    = string
   default = "1"
 }
 
-variable "max_size" {
+variable "eks_spot_max_size" {
   type    = string
   default = "2"
 }
 
-variable "desired_size" {
+variable "eks_spot_desired_size" {
   type    = string
   default = "1"
+}
+
+variable "eks_spot_group" {
+  type    = string
+  default = "spot_group"
 }

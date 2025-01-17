@@ -24,5 +24,7 @@ ingress:
     - path: /
       pathType: Prefix
       backend:
-        serviceName: service  # This references the Service from values.yaml
-        servicePort: 80
+        service:
+          name: service
+          port:
+            number: 80

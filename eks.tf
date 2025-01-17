@@ -3,7 +3,7 @@ module "eks" {
   version = "~> 20" # Use the latest possible version
 
   cluster_name    = var.eks_cluster_name
-  cluster_version = "1.31"
+  cluster_version = var.eks_cluster_version
 
   cluster_endpoint_private_access      = true
   cluster_endpoint_public_access       = true
@@ -33,18 +33,23 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      most_recent = true
+      #addon_version = var.eks_coredns_version
       ##resolve_conflicts = "OVERWRITE"
+      most_recent = true
     }
     eks-pod-identity-agent = {
+      #addon_version = var.eks_pod_identity_agent_version
       ##resolve_conflicts = "OVERWRITE"
       most_recent = true
     }
     kube-proxy = {
+      #addon_version = var.eks_kube_proxy_version
       ##resolve_conflicts = "OVERWRITE"
       most_recent = true
     }
     vpc-cni = {
+      #addon_version            = var.eks_vpc_cni_version
+      #service_account_role_arn = module.cni_irsa_role.iam_role_arn
       ##resolve_conflicts = "OVERWRITE"
       most_recent = true
     }
@@ -64,15 +69,15 @@ module "eks" {
 
   eks_managed_node_groups = {
     on_demand = {
-      name                      = var.on_demand_group
-      cluster_name              = var.eks_cluster_name
-      subnet_ids                = module.vpc.private_subnets
-      ami_type                  = "AL2_x86_64"
-      min_size                  = var.min_size
-      max_size                  = var.max_size
-      desired_size              = var.desired_size
-      capacity_type             = "ON_DEMAND"
-      cluster_service_ipv4_cidr = var.cluster_service_cidr
+      name          = var.eks_on_demand_group
+      cluster_name  = var.eks_cluster_name
+      subnet_ids    = module.vpc.private_subnets
+      ami_type      = "AL2023_x86_64_STANDARD"
+      min_size      = var.eks_on_demand_min_size
+      max_size      = var.eks_on_demand_max_size
+      desired_size  = var.eks_on_demand_desired_size
+      capacity_type = var.eks_on_demand_type
+      //cluster_service_ipv4_cidr = var.cluster_service_cidr
 
       labels = {
         environment = "production"
@@ -80,15 +85,15 @@ module "eks" {
       }
     }
     spot = {
-      name                      = var.spot_group
-      cluster_name              = var.eks_cluster_name
-      subnet_ids                = module.vpc.private_subnets
-      ami_type                  = "AL2_x86_64"
-      min_size                  = var.min_size
-      max_size                  = var.max_size
-      desired_size              = var.desired_size
-      capacity_type             = "ON_DEMAND"
-      cluster_service_ipv4_cidr = var.cluster_service_cidr
+      name          = var.eks_spot_group
+      cluster_name  = var.eks_cluster_name
+      subnet_ids    = module.vpc.private_subnets
+      ami_type      = "AL2023_x86_64_STANDARD"
+      min_size      = var.eks_spot_min_size
+      max_size      = var.eks_spot_max_size
+      desired_size  = var.eks_spot_desired_size
+      capacity_type = var.eks_spot_type
+      //cluster_service_ipv4_cidr = var.cluster_service_cidr
 
       labels = {
         environment = "development"
@@ -97,6 +102,35 @@ module "eks" {
     }
   }
   tags = var.tags
+}
+
+/*data "aws_eks_addon_version" "main" {
+  for_each = toset(["coredns", "kube-proxy", "vpc-cni", "eks-pod-identity-agent"])
+
+  addon_name         = each.value
+  kubernetes_version = var.eks_cluster_version
+  // Setting this to `true` will use the latest addons version for the specified cluster version
+  // Setting this to `false` will use the recommended addons version for the specified cluster version
+  most_recent = true
+}
+*/
+
+data "aws_ssm_parameter" "main" {
+  // The following request is for the AL2023_x86_64_STANDARD ami type set as default in the EKS managed node group
+  // If you change the ami type, you should update the filter values accordingly:
+  // https://docs.aws.amazon.com/eks/latest/userguide/retrieve-ami-id.html
+  name = "/aws/service/eks/optimized-ami/${var.eks_cluster_version}/amazon-linux-2023/x86_64/standard/recommended/image_id"
+}
+
+data "aws_ami" "main" {
+  filter {
+    name   = "image-id"
+    values = [data.aws_ssm_parameter.main.value]
+  }
+
+  most_recent = true
+  // Amazon EKS AMI Account ID
+  owners = ["602401143452"]
 }
 
 
@@ -143,6 +177,8 @@ module "cni_irsa_role" {
     }
   }
 }
+
+
 
 
 

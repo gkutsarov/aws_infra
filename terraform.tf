@@ -19,10 +19,6 @@ terraform {
 
 provider "aws" {
   region = var.region
-  /*assume_role {
-    role_arn     = "arn:aws:iam::905418146175:role/eks_admin_role"
-    session_name = "MySession"
-  }*/
 }
 
 provider "kubernetes" {
@@ -36,7 +32,7 @@ provider "kubernetes" {
         "eks", "get-token",
         "--cluster-name", module.eks.cluster_name,
         "--region", var.region,
-        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"  # Add your correct role ARN here
+        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"
       ]
     }
 }
@@ -53,7 +49,7 @@ provider "helm" {
         "eks", "get-token",
         "--cluster-name", module.eks.cluster_name,
         "--region", var.region,
-        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"  # Add your correct role ARN here
+        "--role-arn", "arn:aws:iam::905418146175:role/eks_admin_role"
       ]
     }
   }
