@@ -37,6 +37,46 @@ resource "aws_iam_role" "eks_admin_role" {
   })
 }
 
+## Create the AWS Secret
+resource "aws_secretsmanager_secret" "github_token" {
+  name = "github-argo"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "github_token" {
+  secret_id = aws_secretsmanager_secret.github_token.id
+  secret_string = jsonencode({
+    username = var.github_username
+    token = var.github_pat
+  })
+}
+
+resource "kubernetes_namespace" "name" {
+  metadata {
+    annotations = {
+      name = "argocd"
+    }
+    name = "argocd"
+  }
+}
+
+## Create k8s secret from the stored secret in AWS. Which we will pass to our ArgoCD
+resource "kubernetes_secret" "argocd_repo_secret" {
+  metadata {
+    name = "github-argo"
+    namespace = "argocd"
+  }
+
+  data = {
+    username = (jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["username"])
+    token    = (jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["token"])
+  } 
+}
+
+
+
+
+
 
 
 

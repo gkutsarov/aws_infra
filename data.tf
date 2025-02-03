@@ -41,3 +41,9 @@ data "aws_subnet" "public_subnet_3" {
   depends_on = [module.vpc]
 }
 
+data "aws_secretsmanager_secret_version" "github_token" {
+  secret_id = aws_secretsmanager_secret.github_token.id
+}
+
+
+

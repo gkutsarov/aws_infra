@@ -1,5 +1,0 @@
-## Chart.yaml
-apiVersion: v2
-name: k8s-resources
-description: A Helm chart for deploying k8s resources - configmap, service, deployment, ingress
-version: 1.0.0

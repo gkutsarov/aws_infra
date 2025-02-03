@@ -14,6 +14,11 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.0"
     }
+
+    argocd = {
+      source = "argoproj-labs/argocd"
+      version = "7.3.0"
+    }
   }
 }
 
@@ -54,3 +59,10 @@ provider "helm" {
     }
   }
 }
+
+/*provider "argocd" {
+  insecure = true
+  server_addr = "http://${data.external.argocd_alb_dns_name.result["hostname"]}:80"
+  username = "admin"
+  password = "dTlL8anYmoZ27d0f"
+}*/

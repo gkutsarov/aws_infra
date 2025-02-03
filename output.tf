@@ -41,6 +41,11 @@ output "eks_admin_role_arn" {
   value = aws_iam_role.eks_admin_role.arn
 }
 
+/*output "argocd_alb_dns_name" {
+  value = data.external.argocd_alb_dns_name.result["hostname"]
+  description = "The DNS name of the ALB created by ArgoCD."
+}*/
+
 /*output "auth_token" {
   value     = data.aws_eks_cluster_auth.auth.token
   sensitive = true
