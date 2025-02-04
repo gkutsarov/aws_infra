@@ -37,21 +37,8 @@ resource "aws_iam_role" "eks_admin_role" {
   })
 }
 
-## Create the AWS Secret
-resource "aws_secretsmanager_secret" "github_token" {
-  name = "github-argo"
-  recovery_window_in_days = 0
-}
-
-resource "aws_secretsmanager_secret_version" "github_token" {
-  secret_id = aws_secretsmanager_secret.github_token.id
-  secret_string = jsonencode({
-    username = var.github_username
-    token = var.github_pat
-  })
-}
-
-resource "kubernetes_namespace" "name" {
+## Create namespace argocd for ArgoCD
+resource "kubernetes_namespace" "argocd_namespace" {
   metadata {
     annotations = {
       name = "argocd"
@@ -72,6 +59,71 @@ resource "kubernetes_secret" "argocd_repo_secret" {
     token    = (jsondecode(data.aws_secretsmanager_secret_version.github_token.secret_string)["token"])
   } 
 }
+
+## LOKI S3s and policies from here
+resource "random_string" "suffix" {
+  length = 6
+  special = false
+  upper = false
+}
+
+resource "aws_s3_bucket" "loki_logs_bucket" {
+  bucket = "loki-log-chunks-${random_string.suffix.result}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket" "loki_alert_rules_bucket" {
+  bucket = "loki-alert-rules-${random_string.suffix.result}"
+  force_destroy = true
+}
+
+
+resource "aws_iam_policy" "loki_s3_policy" {
+  name = "LokiS3AccessPolicy"
+  description = "Policy for Loki to access S3 buckets for logs and alert rules."
+  policy = data.aws_iam_policy_document.loki_policy.json
+}
+
+resource "kubernetes_namespace" "loki" {
+  metadata {
+    annotations = {
+      name = "loki"
+    }
+    name = "loki"
+  }
+}
+
+resource "kubernetes_secret" "loki_auth" { 
+  metadata {
+    name      = "loki-auth" 
+    namespace = "loki" 
+  }
+
+  data = {
+    username = (jsondecode(data.aws_secretsmanager_secret_version.loki_auth.secret_string)["username"]) 
+    password = (jsondecode(data.aws_secretsmanager_secret_version.loki_auth.secret_string)["password"]) 
+  } 
+}
+
+resource "kubernetes_secret" "canary_loki_auth" { 
+  metadata {
+    name      = "canary-loki-auth" 
+    namespace = "loki" 
+  }
+
+  data = {
+    username = (jsondecode(data.aws_secretsmanager_secret_version.canary_loki_auth.secret_string)["username"]) 
+    password = (jsondecode(data.aws_secretsmanager_secret_version.canary_loki_auth.secret_string)["password"]) 
+  } 
+}
+
+
+
+
+
+
+
+
 
 
 

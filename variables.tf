@@ -135,7 +135,7 @@ variable "eks_spot_group" {
   default = "spot_group"
 }
 
-variable "github_username" {
+/*variable "github_username" {
   description = "GitHub username"
   sensitive = true
 }
@@ -143,4 +143,4 @@ variable "github_username" {
 variable "github_pat" {
   description = "Github PAT"
   sensitive = true
-}
+}*/

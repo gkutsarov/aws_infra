@@ -53,6 +53,12 @@ module "eks" {
       ##resolve_conflicts = "OVERWRITE"
       most_recent = true
     }
+    # Enables Kubernetes to dynamically provision and manage EBS volumes as persistent storage for applications. We use this to provision the node volumes for Loki.
+    aws-ebs-csi-driver = {
+      most_recent = true
+    }
+
+
   }
 
   vpc_id                   = module.vpc.vpc_id
@@ -77,6 +83,10 @@ module "eks" {
       max_size      = var.eks_on_demand_max_size
       desired_size  = var.eks_on_demand_desired_size
       capacity_type = var.eks_on_demand_type
+      ebs_optimized = true
+      
+      
+      
       //cluster_service_ipv4_cidr = var.cluster_service_cidr
 
       labels = {
@@ -136,16 +146,16 @@ data "aws_ami" "main" {
 
 module "iam_eks_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = "pod-service-account"
+  role_name = "loki-service-account-role"
 
   role_policy_arns = {
-    policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+    policy = aws_iam_policy.loki_s3_policy.arn
   }
 
   oidc_providers = {
     one = {
       provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["default:pod-service-account"]
+      namespace_service_accounts = ["loki:loki"]
     }
   }
 }
