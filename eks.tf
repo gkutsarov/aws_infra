@@ -9,7 +9,6 @@ module "eks" {
   cluster_endpoint_public_access       = true
   cluster_endpoint_public_access_cidrs = ["77.70.78.206/32"]
   authentication_mode                  = "API"
-
   access_entries = {
     eks_admin = {
       principal_arn = aws_iam_role.eks_admin_role.arn
@@ -56,6 +55,7 @@ module "eks" {
     # Enables Kubernetes to dynamically provision and manage EBS volumes as persistent storage for applications. We use this to provision the node volumes for Loki.
     aws-ebs-csi-driver = {
       most_recent = true
+      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
 
 
@@ -84,6 +84,8 @@ module "eks" {
       desired_size  = var.eks_on_demand_desired_size
       capacity_type = var.eks_on_demand_type
       ebs_optimized = true
+      instance_types = ["t2.large"]
+      
       
       
       
@@ -104,6 +106,9 @@ module "eks" {
       desired_size  = var.eks_spot_desired_size
       capacity_type = var.eks_spot_type
       //cluster_service_ipv4_cidr = var.cluster_service_cidr
+      ebs_optimized = true
+      instance_types = ["t2.large"]
+      
 
       labels = {
         environment = "development"
@@ -160,6 +165,22 @@ module "iam_eks_role" {
   }
 }
 
+module "cloudwatch_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  role_name = "prometheus-cloudwatch-exporter-role"
+
+  role_policy_arns = {
+    policy = aws_iam_policy.cloudwatch_exporter_policy.arn
+  }
+
+  oidc_providers = {
+    one = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["prometheus:prometheus-cloudwatch-exporter-sa"]
+    }
+  }
+}
+
 module "lb_role" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   role_name = "load-balancer-role"
@@ -186,6 +207,20 @@ module "cni_irsa_role" {
       namespace_service_accounts = ["kube-system:vpc_cni_service_account_custom"]
     }
   }
+}
+
+module "ebs_csi_irsa_role" {
+	source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+	role_name             = "${var.eks_cluster_name}-ebs-csi"
+	attach_ebs_csi_policy = true
+
+	oidc_providers = {
+		ex = {
+			provider_arn               = module.eks.oidc_provider_arn
+			namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
+		}
+	}
 }
 
 

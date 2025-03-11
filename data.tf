@@ -57,14 +57,6 @@ data "aws_secretsmanager_secret_version" "loki_auth" {
   secret_id = data.aws_secretsmanager_secret.loki_auth.id
 }
 
-data "aws_secretsmanager_secret" "canary_loki_auth" {
-  name = "canary_loki_auth"
-}
-
-data "aws_secretsmanager_secret_version" "canary_loki_auth" {
-  secret_id = data.aws_secretsmanager_secret.canary_loki_auth.id
-}
-
 ## LOKI S3 BUCKET POLICY
 data "aws_iam_policy_document" "loki_policy" {
    statement {
@@ -86,6 +78,7 @@ data "aws_iam_policy_document" "loki_policy" {
      ]
    }
 }
+
 
 
 

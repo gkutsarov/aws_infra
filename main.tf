@@ -105,17 +105,27 @@ resource "kubernetes_secret" "loki_auth" {
   } 
 }
 
-resource "kubernetes_secret" "canary_loki_auth" { 
-  metadata {
-    name      = "canary-loki-auth" 
-    namespace = "loki" 
-  }
-
-  data = {
-    username = (jsondecode(data.aws_secretsmanager_secret_version.canary_loki_auth.secret_string)["username"]) 
-    password = (jsondecode(data.aws_secretsmanager_secret_version.canary_loki_auth.secret_string)["password"]) 
-  } 
+resource "aws_iam_policy" "cloudwatch_exporter_policy" {
+  name = "cloud-watch-exporter-policy"
+  description = "IAM policy for Prometheus CloudWatch Exporter"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:GetMetricStatistics",
+          "cloudwatch:ListMetrics",
+          "cloudwatch:GetMetricData",
+          "tag:GetResources"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
+
+
 
 
 

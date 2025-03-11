@@ -97,12 +97,12 @@ variable "eks_on_demand_min_size" {
 
 variable "eks_on_demand_max_size" {
   type    = string
-  default = "1"
+  default = "2"
 }
 
 variable "eks_on_demand_desired_size" {
   type    = string
-  default = "1"
+  default = "2"
 }
 
 variable "eks_on_demand_group" {
@@ -127,7 +127,7 @@ variable "eks_spot_max_size" {
 
 variable "eks_spot_desired_size" {
   type    = string
-  default = "1"
+  default = "2"
 }
 
 variable "eks_spot_group" {
