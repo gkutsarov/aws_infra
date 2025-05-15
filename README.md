@@ -61,5 +61,43 @@ Here’s a breakdown of the key files in this repository:
 - Secrets stored in **AWS Secrets Manager** (not plaintext)
 - EKS endpoint access is **CIDR-restricted**
 
+# Architecture Diagram
+```mermaid
+graph TD
+  subgraph AWS
+    VPC[VPC]
+    InternetGW[Internet Gateway]
+    NATGW[NAT Gateway]
+    PublicSubnets[Public Subnets]
+    PrivateSubnets[Private Subnets]
+    EKS[EKS Cluster]
+    ALB[AWS ALB Controller]
+    ArgoCD[ArgoCD (Helm)]
+    NodeGroup1[Managed Node Group - OnDemand]
+    NodeGroup2[Managed Node Group - Spot]
+    SecretsManager[AWS Secrets Manager]
+    IRSA[IRSA Roles]
+    S3[S3 Bucket (for Loki)]
+    CloudWatch[CloudWatch (Prometheus)]
+  end
+
+  InternetGW --> PublicSubnets
+  NATGW --> PrivateSubnets
+  VPC --> PublicSubnets
+  VPC --> PrivateSubnets
+
+  PrivateSubnets --> EKS
+  EKS --> NodeGroup1
+  EKS --> NodeGroup2
+  EKS --> ArgoCD
+  EKS --> ALB
+
+  ArgoCD --> GitHub[GitHub Repo (App of Apps)]
+  IRSA --> EKS
+  IRSA --> S3
+  IRSA --> CloudWatch
+  SecretsManager --> ArgoCD
+```
+
     
 
