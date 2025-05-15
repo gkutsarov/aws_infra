@@ -62,7 +62,7 @@ Here’s a breakdown of the key files in this repository:
 - EKS endpoint access is **CIDR-restricted**
 
 # Architecture Diagram
-```<pre>
+```
 			+---------------------------+
 			|        AWS Account        |
 			+-------------+-------------+
@@ -91,7 +91,6 @@ Here’s a breakdown of the key files in this repository:
         |    ArgoCD     |
         |  App of Apps  |
         +---------------+
-</pre>
 ```
 
 
