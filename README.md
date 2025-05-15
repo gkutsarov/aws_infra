@@ -18,15 +18,42 @@ This repository provisions a complete AWS infrastructure using Terraform. It is 
 
 Here’s a breakdown of the key files in this repository:
 
-- **alb_controller.tf**: Deploys the AWS ALB with our custom EKS values.
-- **argocd.tf**: Deploys ArgoCD, configures a github repository in ArgoCD and deploys initial App of Apps app using the configured repo.
-- **data.tf**: Data block used during the provision of the infrastructure.
-- **eks.tf**: Deploys the EKS, cluster addons, node groups, IAM Roles.
 - **main.tf**
     - Creates AWS IAM users, Route53 DNS zone and core Kubernetes resources.
     - Manages AWS Secrets Manager entries.
     - Includes K8s RBAC and resource entries.
-- **terraform.tf**: Defines the providers with which our terraform code interact with. AWS/K8S/Helm
-- **values.yaml.tpl**: Values file as a template used for ArgoCD. Used for dynamically pass the usernamer + password for the GitHub repository.
-- **variables.yaml**: Variables used for our infrastructure.
+- **eks.tf**
+    - Provisions EKS cluster with cluster-level settings
+    - Configures managed node groups: **ON DEMAND** and **SPOT**
+    - Defines cluster add-ons: coredns, **kube-proxy, vpc-cni, aws-ebs-csi-driver**
+    - IRSA roles for:
+        - Loki (S3 Access)
+        - Prometheus (CloudWatch access)
+        - ALB Controller
+        - VPC CNI
+        - EBS CSI Driver
+    - Dynamically fetches AMI with SSM
+- **vpc.tf**
+    - Creates VPC, public & private subnets, route tables, internet & NAT gateway.
+    - The subnet IDs are referenced in eks.tf for node placement.
+- **alb_controller.tf**
+    - Deploys ALB Ingress Controller via Helm with custom values.
+    - Binds aws-load-balancer-controller service account to IAM role with necessary permissions.
+- **argocd.tf** 
+    - Installs ArgoCD into the cluster via Helm
+    - Configures repository credentials.
+    - Bootstrap initial App of Apps ArgoCD deployment.
+- **data.tf**
+    - Contains data sources:
+        - AWS region, AZs
+        - AMIs
+        - VPC configuration
+- **terraform.tf**
+    - Provider configuration for: AWS, Kubernetes, Helm
+    - Ensures Terraform can communicate with all required APIs
+- **values.yaml.tpl**
+    - Values file as a template used for ArgoCD. Used for dynamically pass the username + password for the GitHub repository.
+- **variables.tf**
+    - Declares variables used accross modules
+    
 
