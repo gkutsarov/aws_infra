@@ -57,8 +57,6 @@ module "eks" {
       most_recent = true
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
-
-
   }
 
   vpc_id                   = module.vpc.vpc_id
@@ -74,6 +72,7 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
+
     on_demand = {
       name          = var.eks_on_demand_group
       cluster_name  = var.eks_cluster_name
@@ -85,17 +84,12 @@ module "eks" {
       capacity_type = var.eks_on_demand_type
       ebs_optimized = true
       instance_types = ["t2.large"]
-      
-      
-      
-      
-      //cluster_service_ipv4_cidr = var.cluster_service_cidr
-
       labels = {
         environment = "production"
         type        = "on_demand"
       }
     }
+
     spot = {
       name          = var.eks_spot_group
       cluster_name  = var.eks_cluster_name
@@ -105,11 +99,8 @@ module "eks" {
       max_size      = var.eks_spot_max_size
       desired_size  = var.eks_spot_desired_size
       capacity_type = var.eks_spot_type
-      //cluster_service_ipv4_cidr = var.cluster_service_cidr
       ebs_optimized = true
       instance_types = ["t2.large"]
-      
-
       labels = {
         environment = "development"
         type        = "spot"

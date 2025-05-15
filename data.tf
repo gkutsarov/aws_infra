@@ -2,21 +2,6 @@ data "aws_availability_zones" "available_azs" {
   state = "available"
 }
 
-/*data "aws_eks_cluster_auth" "my_eks_cluster_auth" {
-  name = var.eks_cluster_name
-}
-
-data "aws_eks_cluster" "my_eks_cluster" {
-  name = var.eks_cluster_name
-}
-
-data "terraform_remote_state" "eks" {
-  backend = "local"
-  config = {
-    path = "terraform.tfstate"
-  }
-}*/
-
 data "aws_subnet" "public_subnet_1" {
   filter {
     name   = "cidrBlock"
