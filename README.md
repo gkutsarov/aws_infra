@@ -14,7 +14,7 @@ This repository provisions a complete AWS infrastructure using Terraform. It is 
 - **SA**: Service Accounts + needed roles and policies which they need to perform certain actions.
 - **ArgoCD**: GitOps CD tool which streamlines the process of deploying applications on our cluster.
 
-# Project Structure
+# :file_folder: Project Structure and File Descriptions
 
 Here’s a breakdown of the key files in this repository:
 
@@ -55,5 +55,11 @@ Here’s a breakdown of the key files in this repository:
     - Values file as a template used for ArgoCD. Used for dynamically pass the username + password for the GitHub repository.
 - **variables.tf**
     - Declares variables used accross modules
+
+# :shield: Security Highlights
+- Usage of **IRSA** for fine-grained service account permissions
+- Secrets stored in **AWS Secrets Manager** (not plaintext)
+- EKS endpoint access is **CIDR-restricted**
+
     
 
