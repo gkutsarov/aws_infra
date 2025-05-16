@@ -82,10 +82,10 @@ Here’s a breakdown of the key files in this repository:
                 |
              IAM (IRSA)
                 |
-        +---------------+         +-------------------------+
-        |   EKS Pods    | <-----> |     AWS Services        |
-        +---------------+         | (S3, CW, EBS, Secrets)  |
-                |                 +-------------------------+
+        +---------------+          +-------------------------+
+        |   EKS Pods    | <------> |     AWS Services        |
+        +---------------+          | (S3, CW, EBS, Secrets)  |
+                |                  +-------------------------+
                 |
         +---------------+
         |    ArgoCD     |
