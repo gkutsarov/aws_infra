@@ -96,8 +96,8 @@ Here’s a breakdown of the key files in this repository:
 # :building_construction: Provision Infrastructure
 ## Prerequisites
 1. Install required tools
-- **Terraform:** Ensure Terraform is installed. You can download it from the [official website](https://developer.hashicorp.com/terraform/install).
-- **AWS CLI:** Install the AWS Command Line Interface. Follow the [installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+    - **Terraform:** Ensure Terraform is installed. You can download it from the [official website](https://developer.hashicorp.com/terraform/install).
+    - **AWS CLI:** Install the AWS Command Line Interface. Follow the [installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 2. Configure AWS Credentials
 Set up your AWS credentials to allow Terraform to authenticate with AWS:
 ```
