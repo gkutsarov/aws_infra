@@ -59,7 +59,7 @@ Here’s a breakdown of the key files in this repository:
 # :shield: Security Highlights
 - Usage of **IRSA** for fine-grained service account permissions
 - Secrets stored in **AWS Secrets Manager** (not plaintext)
-- EKS endpoint access is **CIDR-restricted**
+- EKS endpoint access is **CIDR-restricted** 
 
 # Architecture Diagram
 ```
