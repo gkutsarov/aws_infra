@@ -119,21 +119,29 @@ aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 Terraform will use these credentials by default.
 
 # :rocket: Deployment Steps
-1. Navigate to the Infrastructure Directory
+1. **Navigate to the Infrastructure Directory**
 ```
 cd aws_infra
 ```
-2. Initialize Terraform
+2. **Initialize Terraform**
 ```
 terraform init
 ```
 This command initializes the working directory containing Terraform cinfiguration files.
 
-3. Apply the Terraform Configuration
+3. **Apply the Terraform Configuration**
 ```
 terraform apply --auto-approve
 ```
 This command applies the Terraform configuration to provision the infrastructure. The `--auto-approve` flag skips the interactive approval prompt.
 
+# :heavy_check_mark: Verification
+After deployment, verify that the resources have been created:
+- **AWS Console:** Log in to the AWS Management Console and check the resources in the specified region.
 
-
+# :broom: Cleanup
+To destroy the resources created by Terraform:
+```
+terraform destroy --auto-approve
+```
+This command will remove all resources defined in your Terraform configuration.
