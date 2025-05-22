@@ -103,7 +103,21 @@ Set up your AWS credentials to allow Terraform to authenticate with AWS:
 ```
 aws configure
 ```
+This command will prompt you to enter:
+- **AWS Access Key ID**
+- **AWS Secret Access Key**
+- **Default region name** (e.g us-east-1)
 
+This will create the `~/.aws/credentials` and `~/.aws/config` files with your credentials and configuration.
+
+Alternatively, you can manually create the `~/.aws/credentials` file:
+```
+[default]
+aws_access_key_id = YOUR_ACCESS_KEY_ID
+aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
+```
+
+Terraform will use these credentials by default.
 
     
 
