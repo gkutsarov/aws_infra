@@ -128,6 +128,7 @@ cd aws_infra
 terraform init
 ```
 This command initializes the working directory containing Terraform cinfiguration files.
+
 3. Apply the Terraform Configuration
 ```
 terraform apply --auto-approve
