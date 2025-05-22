@@ -93,8 +93,7 @@ Here’s a breakdown of the key files in this repository:
         +---------------+
 ```
 
-# :building_construction: Provision Infrastructure
-## Prerequisites
+# :hammer_and_wrench: Prerequisites
 1. Install required tools
     - **Terraform:** Ensure Terraform is installed. You can download it from the [official website](https://developer.hashicorp.com/terraform/install).
     - **AWS CLI:** Install the AWS Command Line Interface. Follow the [installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
@@ -119,5 +118,21 @@ aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 
 Terraform will use these credentials by default.
 
-    
+# :rocket: Deployment Steps
+1. Navigate to the Infrastructure Directory
+```
+cd aws_infra
+```
+2. Initialize Terraform
+```
+terraform init
+```
+This command initializes the working directory containing Terraform cinfiguration files.
+3. Apply the Terraform Configuration
+```
+terraform apply --auto-approve
+```
+This command applies the Terraform configuration to provision the infrastructure. The `--auto-approve` flag skips the interactive approval prompt.
+
+
 
